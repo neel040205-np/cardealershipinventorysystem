@@ -25,3 +25,12 @@ export const updateVehicleSchema = z.object({
     })
     .strict()
 });
+
+// Zod schema for vehicle restocking validation
+export const restockVehicleSchema = z.object({
+  body: z
+    .object({
+      quantity: z.number().int("Quantity must be an integer").positive("Quantity must be greater than zero")
+    })
+    .strict()
+});

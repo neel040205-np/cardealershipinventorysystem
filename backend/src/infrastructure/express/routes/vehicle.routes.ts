@@ -3,7 +3,7 @@ import { vehicleController } from "@infra/di/container";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { adminMiddleware } from "../middlewares/admin.middleware";
 import { validateRequest } from "../middlewares/validation.middleware";
-import { createVehicleSchema, updateVehicleSchema } from "../validation/vehicle.schemas";
+import { createVehicleSchema, updateVehicleSchema, restockVehicleSchema } from "../validation/vehicle.schemas";
 
 const router = Router();
 
@@ -37,5 +37,14 @@ router.delete("/:id", authMiddleware, adminMiddleware, vehicleController.delete)
 
 // POST /api/vehicles/:id/purchase (Purchase vehicle - Authenticated users only)
 router.post("/:id/purchase", authMiddleware, vehicleController.purchase);
+
+// POST /api/vehicles/:id/restock (Restock vehicle - Admin only)
+router.post(
+  "/:id/restock",
+  authMiddleware,
+  adminMiddleware,
+  validateRequest(restockVehicleSchema),
+  vehicleController.restock
+);
 
 export { router as vehicleRouter };

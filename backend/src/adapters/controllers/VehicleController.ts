@@ -5,6 +5,7 @@ import { SearchVehicles } from "@usecases/vehicle/SearchVehicles";
 import { UpdateVehicle } from "@usecases/vehicle/UpdateVehicle";
 import { DeleteVehicle } from "@usecases/vehicle/DeleteVehicle";
 import { PurchaseVehicle } from "@usecases/vehicle/PurchaseVehicle";
+import { RestockVehicle } from "@usecases/vehicle/RestockVehicle";
 import { sendSuccessResponse } from "@infra/express/utils/response";
 import { VehicleMapper } from "@adapters/mappers/VehicleMapper";
 
@@ -15,7 +16,8 @@ export class VehicleController {
     private searchUseCase: SearchVehicles,
     private updateUseCase: UpdateVehicle,
     private deleteUseCase: DeleteVehicle,
-    private purchaseUseCase: PurchaseVehicle
+    private purchaseUseCase: PurchaseVehicle,
+    private restockUseCase: RestockVehicle
   ) {}
 
   // POST /api/vehicles
@@ -92,6 +94,18 @@ export class VehicleController {
     try {
       const { id } = req.params;
       const vehicle = await this.purchaseUseCase.execute(id);
+      sendSuccessResponse(res, 200, { vehicle: VehicleMapper.toResponseDTO(vehicle) });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // POST /api/vehicles/:id/restock
+  restock = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const { quantity } = req.body;
+      const vehicle = await this.restockUseCase.execute(id, quantity);
       sendSuccessResponse(res, 200, { vehicle: VehicleMapper.toResponseDTO(vehicle) });
     } catch (error) {
       next(error);
