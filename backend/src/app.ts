@@ -51,6 +51,10 @@ app.get("/health", (_req, res) => {
   });
 });
 
+// Mount root router under versioned path
+import { rootRouter } from "@infra/express/routes";
+app.use("/api/v1", rootRouter);
+
 // Catch-all route handler returning 404 for unmapped endpoints
 app.use((_req, _res, next) => {
   next(new NotFoundError("The requested API route does not exist."));
