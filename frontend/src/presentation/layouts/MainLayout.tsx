@@ -38,7 +38,7 @@ export const MainLayout: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-50 transition-colors duration-200">
-      {/* Mobile Sidebar Overlay */}
+      {/* Mobile Sidebar Overlay: Click to close drawer */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-gray-900/50 backdrop-blur-sm lg:hidden"
