@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { RegisterUser } from "@usecases/auth/RegisterUser";
 import { LoginUser } from "@usecases/auth/LoginUser";
 import { UserMapper } from "../mappers/UserMapper";
+import { sendSuccessResponse } from "@infra/express/utils/response";
 
 export class AuthController {
   constructor(
@@ -15,14 +16,8 @@ export class AuthController {
       const { name, email, password } = req.body;
       const user = await this.registerUserUseCase.execute({ name, email, password });
 
-      res.status(201).json({
-        success: true,
-        data: {
-          user: UserMapper.toResponse(user)
-        },
-        meta: {
-          timestamp: new Date().toISOString()
-        }
+      sendSuccessResponse(res, 201, {
+        user: UserMapper.toResponse(user)
       });
     } catch (error) {
       next(error);
@@ -35,15 +30,9 @@ export class AuthController {
       const { email, password } = req.body;
       const { token, user } = await this.loginUserUseCase.execute({ email, password });
 
-      res.status(200).json({
-        success: true,
-        data: {
-          token,
-          user: UserMapper.toResponse(user)
-        },
-        meta: {
-          timestamp: new Date().toISOString()
-        }
+      sendSuccessResponse(res, 200, {
+        token,
+        user: UserMapper.toResponse(user)
       });
     } catch (error) {
       next(error);

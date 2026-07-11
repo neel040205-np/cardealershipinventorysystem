@@ -1,3 +1,7 @@
+export interface TokenOptions {
+  expiresIn?: string | number;
+}
+
 export interface ITokenService {
-  generate(payload: { userId: string; email: string; role: string }): string;
+  generate(payload: Record<string, unknown>, options?: TokenOptions): string;
 }
