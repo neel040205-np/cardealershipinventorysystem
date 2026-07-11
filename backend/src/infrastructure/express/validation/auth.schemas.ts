@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 // Zod Request Validation Schema for User Registration
-// Enforces name, email, password parameters and rejects extra payload fields using .strict()
 export const registerSchema = z.object({
   body: z
     .object({
@@ -12,3 +11,14 @@ export const registerSchema = z.object({
     .strict()
 });
 export type RegisterSchema = z.infer<typeof registerSchema>;
+
+// Zod Request Validation Schema for User Login
+export const loginSchema = z.object({
+  body: z
+    .object({
+      email: z.string().email("Invalid email address format"),
+      password: z.string().min(1, "Password is required")
+    })
+    .strict()
+});
+export type LoginSchema = z.infer<typeof loginSchema>;
