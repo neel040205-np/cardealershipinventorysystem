@@ -5,6 +5,7 @@ import { SearchVehicles } from "@usecases/vehicle/SearchVehicles";
 import { UpdateVehicle } from "@usecases/vehicle/UpdateVehicle";
 import { DeleteVehicle } from "@usecases/vehicle/DeleteVehicle";
 import { sendSuccessResponse } from "@infra/express/utils/response";
+import { VehicleMapper } from "@adapters/mappers/VehicleMapper";
 
 export class VehicleController {
   constructor(
@@ -20,7 +21,7 @@ export class VehicleController {
     try {
       const { make, model, category, price, quantity } = req.body;
       const vehicle = await this.createUseCase.execute({ make, model, category, price, quantity });
-      sendSuccessResponse(res, 201, { vehicle });
+      sendSuccessResponse(res, 201, { vehicle: VehicleMapper.toResponseDTO(vehicle) });
     } catch (error) {
       next(error);
     }
@@ -32,7 +33,10 @@ export class VehicleController {
       const page = req.query.page ? Number(req.query.page) : undefined;
       const limit = req.query.limit ? Number(req.query.limit) : undefined;
       const result = await this.listUseCase.execute({ page, limit });
-      sendSuccessResponse(res, 200, result);
+      sendSuccessResponse(res, 200, {
+        vehicles: result.vehicles.map(VehicleMapper.toResponseDTO),
+        total: result.total
+      });
     } catch (error) {
       next(error);
     }
@@ -50,7 +54,9 @@ export class VehicleController {
         maxPrice: maxPrice ? Number(maxPrice) : undefined
       };
       const result = await this.searchUseCase.execute(filters);
-      sendSuccessResponse(res, 200, result);
+      sendSuccessResponse(res, 200, {
+        vehicles: result.vehicles.map(VehicleMapper.toResponseDTO)
+      });
     } catch (error) {
       next(error);
     }
@@ -62,7 +68,7 @@ export class VehicleController {
       const { id } = req.params;
       const { make, model, category, price, quantity } = req.body;
       const vehicle = await this.updateUseCase.execute(id, { make, model, category, price, quantity });
-      sendSuccessResponse(res, 200, { vehicle });
+      sendSuccessResponse(res, 200, { vehicle: VehicleMapper.toResponseDTO(vehicle) });
     } catch (error) {
       next(error);
     }

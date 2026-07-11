@@ -1,6 +1,7 @@
 import { Vehicle as PrismaVehicle } from "@prisma/client";
 import { IVehicleRepository } from "@usecases/ports/IVehicleRepository";
 import { prisma } from "@infra/database/prisma-client";
+import { isValidUuidOrTestId } from "../utils/uuid";
 
 export class PrismaVehicleRepository implements IVehicleRepository {
   async create(data: {
@@ -22,11 +23,7 @@ export class PrismaVehicleRepository implements IVehicleRepository {
   }
 
   async findById(id: string): Promise<PrismaVehicle | null> {
-    // Enforce standard UUID format check to prevent database crash on bad query string lookups,
-    // but allow simple mock test IDs (like uuid-v1) used in test suites
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const isTestId = id.startsWith("uuid-");
-    if (!uuidRegex.test(id) && !isTestId) {
+    if (!isValidUuidOrTestId(id)) {
       return null;
     }
 
