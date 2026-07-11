@@ -314,7 +314,7 @@ export const AdminPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right font-semibold text-gray-900 dark:text-white">
-                      ${vehicle.price.toLocaleString()}
+                      ₹{Number(vehicle.price).toLocaleString("en-IN")}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <span

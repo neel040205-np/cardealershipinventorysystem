@@ -50,7 +50,7 @@ const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
       <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/80 space-y-3">
         <div className="flex items-baseline justify-between">
           <p className="text-2xl font-black text-gray-900 dark:text-white">
-            ${vehicle.price.toLocaleString()}
+            ₹{Number(vehicle.price).toLocaleString("en-IN")}
           </p>
           <span
             className={`text-xs font-bold uppercase tracking-wider ${
