@@ -14,12 +14,14 @@ describe("Use Case: RegisterUser Interactor", () => {
     const useCase = new RegisterUser(userRepo, mockHashService);
 
     const result = await useCase.execute({
+      name: "John Doe",
       email: "new.rep@dealership.com",
       password: "Password123!",
       role: "SALES_REP"
     });
 
     expect(mockHashService.hash).toHaveBeenCalledWith("Password123!");
+    expect(result.name).toBe("John Doe");
     expect(result.email).toBe("new.rep@dealership.com");
     expect(result.passwordHash).toBe("hashed_Password123!");
     expect(result.role).toBe("SALES_REP");
@@ -29,6 +31,7 @@ describe("Use Case: RegisterUser Interactor", () => {
   it("should throw ConflictError if email is already taken", async () => {
     const userRepo = new InMemoryUserRepository();
     await userRepo.create({
+      name: "Existing User",
       email: "duplicate@dealership.com",
       passwordHash: "hashed_pwd",
       role: "SALES_REP"
@@ -38,6 +41,7 @@ describe("Use Case: RegisterUser Interactor", () => {
 
     await expect(
       useCase.execute({
+        name: "John Doe",
         email: "duplicate@dealership.com",
         password: "Password123!",
         role: "SALES_REP"

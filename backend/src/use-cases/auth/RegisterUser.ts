@@ -10,9 +10,11 @@ export class RegisterUser {
     private hashService: IHashService
   ) {}
 
-  async execute(dto: { email: string; password: string; role: Role }): Promise<User> {
+  async execute(dto: { name: string; email: string; password: string; role?: Role }): Promise<User> {
+    const role = dto.role || Role.SALES_REP;
+
     // 1. Validate domain invariants using User entity static constructor
-    UserDomain.create(dto.email, dto.password, dto.role);
+    UserDomain.create(dto.name, dto.email, dto.password, role);
 
     // 2. Verify email uniqueness
     const existing = await this.userRepo.findByEmail(dto.email);
@@ -25,9 +27,10 @@ export class RegisterUser {
 
     // 4. Persist to database
     return this.userRepo.create({
+      name: dto.name,
       email: dto.email,
       passwordHash,
-      role: dto.role
+      role
     });
   }
 }

@@ -7,12 +7,13 @@ export class AuthController {
   // POST /auth/register
   register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { email, password, role } = req.body;
-      const user = await this.registerUserUseCase.execute({ email, password, role });
+      const { name, email, password } = req.body;
+      const user = await this.registerUserUseCase.execute({ name, email, password });
 
       // Strip sensitive password hash before sending response to client
       const responseUser = {
         id: user.id,
+        name: user.name,
         email: user.email,
         role: user.role,
         createdAt: user.createdAt

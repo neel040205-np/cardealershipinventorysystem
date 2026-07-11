@@ -9,9 +9,10 @@ export class PrismaUserRepository implements IUserRepository {
     });
   }
 
-  async create(data: { email: string; passwordHash: string; role: Role }): Promise<User> {
+  async create(data: { name: string; email: string; passwordHash: string; role: Role }): Promise<User> {
     return prisma.user.create({
       data: {
+        name: data.name,
         email: data.email.toLowerCase(),
         passwordHash: data.passwordHash,
         role: data.role

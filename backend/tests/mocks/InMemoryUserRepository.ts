@@ -9,9 +9,10 @@ export class InMemoryUserRepository implements IUserRepository {
     return user || null;
   }
 
-  async create(data: { email: string; passwordHash: string; role: Role }): Promise<User> {
+  async create(data: { name: string; email: string; passwordHash: string; role: Role }): Promise<User> {
     const newUser: User = {
       id: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(),
+      name: data.name,
       email: data.email,
       passwordHash: data.passwordHash,
       role: data.role,

@@ -6,6 +6,25 @@ const winston_1 = require("@infra/logging/winston");
 // Global Express Error-Handling Middleware
 const errorHandler = (err, req, res, _next) => {
     const timestamp = new Date().toISOString();
+    // Handle Express JSON parsing syntax errors (e.g. malformed JSON payloads)
+    if (err instanceof SyntaxError && "status" in err && err.status === 400 && "body" in err) {
+        winston_1.logger.warn("Operational Error: 400 - BAD_REQUEST - Malformed JSON payload", {
+            path: req.path,
+            method: req.method
+        });
+        res.status(400).json({
+            success: false,
+            error: {
+                statusCode: 400,
+                code: "BAD_REQUEST",
+                message: "Malformed JSON payload."
+            },
+            meta: {
+                timestamp
+            }
+        });
+        return;
+    }
     // If the error is an instance of our operational AppError
     if (err instanceof AppError_1.AppError) {
         winston_1.logger.warn(`Operational Error: ${err.statusCode} - ${err.code} - ${err.message}`, {
