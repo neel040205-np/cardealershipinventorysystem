@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
 
 // Protected Route Guard restricting access based on session status and user roles
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
+  // Query session claims and roles from the global Auth Context
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
