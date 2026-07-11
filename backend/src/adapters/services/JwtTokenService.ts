@@ -10,4 +10,9 @@ export class JwtTokenService implements ITokenService {
       expiresIn: (options?.expiresIn as any) || "1h"
     });
   }
+
+  verify(token: string, _options?: TokenOptions): Record<string, unknown> {
+    const secret = env.JWT_ACCESS_SECRET;
+    return jwt.verify(token, secret) as Record<string, unknown>;
+  }
 }

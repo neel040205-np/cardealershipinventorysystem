@@ -9,7 +9,8 @@ import { JwtTokenService } from "@adapters/services/JwtTokenService";
 // satisfy dependency inversion ports with clean DI manual mappings
 const userRepository = new PrismaUserRepository();
 const hashService = new BcryptHashService();
-const tokenService = new JwtTokenService();
+
+export const tokenService = new JwtTokenService();
 
 const registerUserUseCase = new RegisterUser(userRepository, hashService);
 const loginUserUseCase = new LoginUser(userRepository, hashService, tokenService);
