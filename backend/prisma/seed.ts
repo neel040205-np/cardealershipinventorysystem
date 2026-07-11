@@ -3,8 +3,11 @@ import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
+// Currency conversion rate: 1 USD = 95.56 INR
+const USD_TO_INR = 95.56;
+
 async function main() {
-  console.log("🌱 Starting database seeding...");
+  console.log("🌱 Starting database seeding with prices in INR...");
 
   // 1. Clean existing records
   await prisma.salesTransaction.deleteMany();
@@ -43,43 +46,43 @@ async function main() {
   - Admin: ${admin.email} (Password: AdminPassword123!)
   - Sales Rep: ${salesRep.email} (Password: SalesPassword123!)`);
 
-  // 5. Create starter vehicles catalog
+  // 5. Create starter vehicles catalog with prices converted from USD to INR
   const vehicles = await prisma.vehicle.createMany({
     data: [
       {
         make: "Toyota",
         model: "Camry",
         category: "Sedan",
-        price: 26400,
+        price: Math.round(26400 * USD_TO_INR), // ~25,22,784 INR
         quantity: 12
       },
       {
         make: "Ford",
         model: "Mustang GT",
         category: "Sports",
-        price: 42500,
+        price: Math.round(42500 * USD_TO_INR), // ~40,61,300 INR
         quantity: 3
       },
       {
         make: "Tesla",
         model: "Model 3",
         category: "Electric",
-        price: 38990,
+        price: Math.round(38990 * USD_TO_INR), // ~37,25,884 INR
         quantity: 8
       },
       {
         make: "Jeep",
         model: "Wrangler",
         category: "SUV",
-        price: 36800,
+        price: Math.round(36800 * USD_TO_INR), // ~35,16,608 INR
         quantity: 5
       },
       {
         make: "Honda",
         model: "Civic",
         category: "Sedan",
-        price: 23950,
-        quantity: 0 // Out of stock to test restock/unavailability
+        price: Math.round(23950 * USD_TO_INR), // ~22,88,662 INR
+        quantity: 0 // Out of stock
       }
     ]
   });
