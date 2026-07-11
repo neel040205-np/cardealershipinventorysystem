@@ -17,7 +17,7 @@ enum Role {
   SALES_REP
 }
 
-enum CarStatus {
+enum VehicleStatus {
   AVAILABLE
   RESERVED
   SOLD
@@ -47,18 +47,18 @@ enum ReservationStatus {
 // ==========================================
 
 model User {
-  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email         String             @unique @db.VarChar(255)
-  passwordHash  String             @map("password_hash") @db.VarChar(255)
-  role          Role               @default(SALES_REP)
-  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt     DateTime           @updatedAt @map("updated_at") @db.Timestamptz
-  
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  role         Role     @default(SALES_REP)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
   // Relations
-  refreshTokens     RefreshToken[]
-  createdCars       Car[]
+  refreshTokens       RefreshToken[]
+  createdVehicles     Vehicle[]
   managedReservations Reservation[]
-  salesTransactions  SalesTransaction[]
+  salesTransactions   SalesTransaction[]
 
   @@map("users")
 }
@@ -78,36 +78,36 @@ model RefreshToken {
   @@map("refresh_tokens")
 }
 
-model Car {
-  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  make            String       @db.VarChar(100)
-  model           String       @db.VarChar(100)
+model Vehicle {
+  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  make            String        @db.VarChar(100)
+  model           String        @db.VarChar(100)
   year            Int
-  vin             String       @unique @db.VarChar(17)
-  price           Decimal      @db.Decimal(12, 2)
-  status          CarStatus    @default(AVAILABLE)
+  vin             String        @unique @db.VarChar(17)
+  price           Decimal       @db.Decimal(12, 2)
+  status          VehicleStatus @default(AVAILABLE)
   mileage         Int
   transmission    Transmission
-  fuelType        FuelType     @map("fuel_type")
-  color           String       @db.VarChar(50)
-  createdByUserId String       @map("created_by_id") @db.Uuid
-  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+  fuelType        FuelType      @map("fuel_type")
+  color           String        @db.VarChar(50)
+  createdByUserId String        @map("created_by_id") @db.Uuid
+  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
   createdBy        User              @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
   reservations     Reservation[]
   salesTransaction SalesTransaction?
 
-  @@index([status, make, model], name: "idx_car_status_make_model")
-  @@index([price], name: "idx_car_price")
-  @@index([createdAt(sort: Desc)], name: "idx_car_created_at")
-  @@map("cars")
+  @@index([status, make, model], name: "idx_vehicle_status_make_model")
+  @@index([price], name: "idx_vehicle_price")
+  @@index([createdAt(sort: Desc)], name: "idx_vehicle_created_at")
+  @@map("vehicles")
 }
 
 model Reservation {
   id            String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  carId         String            @map("car_id") @db.Uuid
+  vehicleId     String            @map("vehicle_id") @db.Uuid
   customerName  String            @map("customer_name") @db.VarChar(100)
   customerEmail String            @map("customer_email") @db.VarChar(255)
   customerPhone String            @map("customer_phone") @db.VarChar(50)
@@ -118,17 +118,17 @@ model Reservation {
   updatedAt     DateTime          @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
-  car      Car  @relation(fields: [carId], references: [id], onDelete: Restrict)
-  salesRep User @relation(fields: [salesRepId], references: [id], onDelete: Restrict)
+  vehicle  Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  salesRep User    @relation(fields: [salesRepId], references: [id], onDelete: Restrict)
 
-  @@index([carId, status], name: "idx_res_car_status")
+  @@index([vehicleId, status], name: "idx_res_vehicle_status")
   @@index([reservedUntil], name: "idx_res_reserved_until")
   @@map("reservations")
 }
 
 model SalesTransaction {
   id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  carId      String   @unique @map("car_id") @db.Uuid
+  vehicleId  String   @unique @map("vehicle_id") @db.Uuid
   buyerName  String   @map("buyer_name") @db.VarChar(100)
   buyerEmail String   @map("buyer_email") @db.VarChar(255)
   buyerPhone String   @map("buyer_phone") @db.VarChar(50)
@@ -139,8 +139,8 @@ model SalesTransaction {
   updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
-  car      Car  @relation(fields: [carId], references: [id], onDelete: Restrict)
-  salesRep User @relation(fields: [salesRepId], references: [id], onDelete: Restrict)
+  vehicle  Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Restrict)
+  salesRep User    @relation(fields: [salesRepId], references: [id], onDelete: Restrict)
 
   @@index([soldAt], name: "idx_sales_sold_at")
   @@map("sales_transactions")
