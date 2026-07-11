@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import { DomainException } from "@domain/exceptions/AppError";
+import { Email } from "../value-objects/Email";
 
 // User Domain Entity Enforcing Domain Invariants
 export class User {
@@ -14,11 +15,8 @@ export class User {
 
   // Static Factory Method for Creating a New User (with validation)
   public static create(email: string, passwordPlain: string, role: Role, id?: string): User {
-    // 1. Email format invariant check
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      throw new DomainException("Invalid email address format.");
-    }
+    // 1. Validate email syntax using the Email value object
+    const validatedEmail = Email.create(email);
 
     // 2. Password length invariant check
     if (passwordPlain.length < 8) {
@@ -31,11 +29,10 @@ export class User {
       throw new DomainException("Invalid user role specified.");
     }
 
-    // We initialize passwordHash as empty; it will be filled by the hash service in the use-case layer.
-    return new User(email, "", role, id);
+    return new User(validatedEmail.value, "", role, id);
   }
 
-  // Static Factory Method for Reconstructing User from Database Records (bypassing domain validation checks)
+  // Static Factory Method for Reconstructing User from Database Records
   public static reconstruct(
     id: string,
     email: string,
