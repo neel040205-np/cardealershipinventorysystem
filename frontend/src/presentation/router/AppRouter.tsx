@@ -7,9 +7,9 @@ import { LoginPage } from "@presentation/pages/auth/LoginPage";
 import { RegisterPage } from "@presentation/pages/auth/RegisterPage";
 import { VehiclesPage } from "@presentation/pages/vehicles/VehiclesPage";
 import { SearchPage } from "@presentation/pages/vehicles/SearchPage";
+import { AdminPage } from "@presentation/pages/admin/AdminPage";
 
 // Dummy Page Stubs to ensure successful compilation without concrete pages implementations
-const DummyAdmin = () => <div className="p-4">Admin Inventory Operations (Not Implemented)</div>;
 const DummyUnauthorized = () => <div className="p-4 text-red-600 font-bold">Unauthorized Access</div>;
 
 export const AppRouter: React.FC = () => {
@@ -31,7 +31,7 @@ export const AppRouter: React.FC = () => {
 
             {/* Admin-only restricted views */}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
-              <Route path="/admin" element={<DummyAdmin />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Route>
           </Route>
         </Route>

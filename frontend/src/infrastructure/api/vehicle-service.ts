@@ -32,8 +32,35 @@ export const vehicleService = {
   async purchase(id: string): Promise<Vehicle> {
     const response = await axiosClient.post(`/vehicles/${id}/purchase`);
     return response.data.data.vehicle;
+  },
+
+  async create(data: CreateVehicleData): Promise<Vehicle> {
+    const response = await axiosClient.post("/vehicles", data);
+    return response.data.data.vehicle;
+  },
+
+  async update(id: string, data: Partial<CreateVehicleData>): Promise<Vehicle> {
+    const response = await axiosClient.put(`/vehicles/${id}`, data);
+    return response.data.data.vehicle;
+  },
+
+  async delete(id: string): Promise<void> {
+    await axiosClient.delete(`/vehicles/${id}`);
+  },
+
+  async restock(id: string, quantity: number): Promise<Vehicle> {
+    const response = await axiosClient.post(`/vehicles/${id}/restock`, { quantity });
+    return response.data.data.vehicle;
   }
 };
+
+export interface CreateVehicleData {
+  make: string;
+  model: string;
+  category: string;
+  price: number;
+  quantity: number;
+}
 
 export interface SearchFilters {
   make?: string;
