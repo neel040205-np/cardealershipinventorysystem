@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { RegisterUser } from "@usecases/auth/RegisterUser";
+import { UserMapper } from "../mappers/UserMapper";
 
 export class AuthController {
   constructor(private registerUserUseCase: RegisterUser) {}
@@ -10,19 +11,10 @@ export class AuthController {
       const { name, email, password } = req.body;
       const user = await this.registerUserUseCase.execute({ name, email, password });
 
-      // Strip sensitive password hash before sending response to client
-      const responseUser = {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        createdAt: user.createdAt
-      };
-
       res.status(201).json({
         success: true,
         data: {
-          user: responseUser
+          user: UserMapper.toResponse(user)
         },
         meta: {
           timestamp: new Date().toISOString()

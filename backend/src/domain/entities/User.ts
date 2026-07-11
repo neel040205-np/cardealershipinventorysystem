@@ -1,6 +1,7 @@
 import { Role } from "@prisma/client";
 import { DomainException } from "@domain/exceptions/AppError";
 import { Email } from "../value-objects/Email";
+import { Name } from "../value-objects/Name";
 
 // User Domain Entity Enforcing Domain Invariants
 export class User {
@@ -16,10 +17,8 @@ export class User {
 
   // Static Factory Method for Creating a New User (with validation)
   public static create(name: string, email: string, passwordPlain: string, role: Role, id?: string): User {
-    // 1. Name invariant check
-    if (!name || name.trim().length === 0) {
-      throw new DomainException("Name is required.");
-    }
+    // 1. Validate name syntax using the Name value object
+    const validatedName = Name.create(name);
 
     // 2. Validate email syntax using the Email value object
     const validatedEmail = Email.create(email);
@@ -35,7 +34,7 @@ export class User {
       throw new DomainException("Invalid user role specified.");
     }
 
-    return new User(name, validatedEmail.value, "", role, id);
+    return new User(validatedName.value, validatedEmail.value, "", role, id);
   }
 
   // Static Factory Method for Reconstructing User from Database Records
