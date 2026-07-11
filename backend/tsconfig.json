@@ -23,13 +23,12 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./",
-    "ignoreDeprecations": "5.0",
+
     "paths": {
-      "@domain/*": ["src/domain/*"],
-      "@usecases/*": ["src/use-cases/*"],
-      "@adapters/*": ["src/adapters/*"],
-      "@infra/*": ["src/infrastructure/*"]
+      "@domain/*": ["./src/domain/*"],
+      "@usecases/*": ["./src/use-cases/*"],
+      "@adapters/*": ["./src/adapters/*"],
+      "@infra/*": ["./src/infrastructure/*"]
     }
   },
   "include": ["src/**/*"],
