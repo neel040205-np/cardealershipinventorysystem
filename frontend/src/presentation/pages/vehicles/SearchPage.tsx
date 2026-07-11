@@ -8,48 +8,51 @@ import { Card } from "@presentation/components/shared/Card";
 import { Input } from "@presentation/components/shared/Input";
 import { Car, Search, AlertTriangle, Package, SlidersHorizontal } from "lucide-react";
 
-// Result card (reused from VehiclesPage pattern)
+// Result card (matching VehiclesPage styles for visual consistency)
 const VehicleResultCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const inStock = vehicle.quantity > 0;
   return (
-    <Card hoverable>
-      <div className="mb-4 flex h-36 items-center justify-center rounded-xl bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-850">
-        <Car className="h-14 w-14 text-gray-300 dark:text-gray-600" />
-      </div>
-      <div className="space-y-2">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
-          {vehicle.make} {vehicle.model}
-        </h3>
-        <span className="inline-block rounded-full bg-brand-50 px-3 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-900/20 dark:text-brand-500">
-          {vehicle.category}
-        </span>
-        <div className="flex items-end justify-between pt-2 border-t border-gray-100 dark:border-gray-800">
-          <p className="text-xl font-extrabold text-gray-900 dark:text-white">
-            ${vehicle.price.toLocaleString()}
-          </p>
-          <span
-            className={`text-xs font-bold uppercase tracking-wider ${
-              inStock ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"
-            }`}
-          >
-            {inStock ? `${vehicle.quantity} in stock` : "Out of stock"}
+    <Card hoverable className="flex flex-col h-full justify-between">
+      <div>
+        <div className="group relative mb-4 flex h-40 items-center justify-center rounded-xl bg-gradient-to-br from-brand-50/50 via-gray-100 to-gray-50 dark:from-brand-950/20 dark:via-gray-800/60 dark:to-gray-900 overflow-hidden border border-gray-100 dark:border-gray-800/30">
+          <div className="absolute inset-0 bg-brand-500/0 group-hover:bg-brand-500/5 dark:group-hover:bg-brand-500/10 transition-colors duration-300" />
+          <Car className="h-14 w-14 text-gray-300 dark:text-gray-600 group-hover:scale-110 group-hover:text-brand-500/40 dark:group-hover:text-brand-400/30 transition-all duration-500" />
+        </div>
+        <div className="space-y-1.5">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate" title={`${vehicle.make} ${vehicle.model}`}>
+            {vehicle.make} {vehicle.model}
+          </h3>
+          <span className="inline-flex items-center rounded-full bg-brand-50/85 px-2.5 py-0.5 text-xs font-semibold text-brand-600 dark:bg-brand-950/40 dark:text-brand-400">
+            {vehicle.category}
           </span>
         </div>
+      </div>
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-baseline justify-between">
+        <p className="text-2xl font-black text-gray-900 dark:text-white">
+          ${vehicle.price.toLocaleString()}
+        </p>
+        <span
+          className={`text-xs font-bold uppercase tracking-wider ${
+            inStock ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"
+          }`}
+        >
+          {inStock ? `${vehicle.quantity} in stock` : "Out of stock"}
+        </span>
       </div>
     </Card>
   );
 };
 
-// Skeleton
+// Skeleton card shown during loading with pulsing gradient effect
 const ResultSkeleton: React.FC = () => (
-  <div className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-    <div className="mb-4 flex h-36 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-800" />
+  <div className="animate-pulse rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800/80 dark:bg-gray-900/60">
+    <div className="mb-4 h-40 rounded-xl bg-gray-100 dark:bg-gray-800/80" />
     <div className="space-y-3">
-      <div className="h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700" />
-      <div className="flex justify-between pt-2">
-        <div className="h-6 w-24 rounded bg-gray-200 dark:bg-gray-700" />
-        <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-700" />
+      <div className="h-5 w-3/4 rounded bg-gray-200 dark:bg-gray-850" />
+      <div className="h-4 w-1/4 rounded bg-gray-200 dark:bg-gray-850" />
+      <div className="flex justify-between items-center pt-3 border-t border-gray-100 dark:border-gray-800">
+        <div className="h-6 w-24 rounded bg-gray-200 dark:bg-gray-850" />
+        <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-850" />
       </div>
     </div>
   </div>
@@ -65,7 +68,7 @@ export const SearchPage: React.FC = () => {
   const [minPrice, setMinPrice] = useState(searchParams.get("minPrice") || "");
   const [maxPrice, setMaxPrice] = useState(searchParams.get("maxPrice") || "");
 
-  // Debounce all inputs by 400ms
+  // Debounce all inputs by 400ms to reduce API load
   const debouncedMake = useDebounce(make, 400);
   const debouncedModel = useDebounce(model, 400);
   const debouncedCategory = useDebounce(category, 400);
@@ -113,24 +116,24 @@ export const SearchPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 max-w-7xl mx-auto">
       {/* Page header */}
       <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-          Search Vehicles
+        <h1 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white sm:text-4xl">
+          Search Catalog
         </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Filter the inventory by make, model, category, or price range
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+          Filter the dealership catalog dynamically using the attributes below
         </p>
       </div>
 
       {/* Filter panel */}
-      <Card>
-        <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
-          <SlidersHorizontal className="h-4 w-4" />
-          Filters
+      <Card className="shadow-md bg-white/70 dark:bg-gray-900/40 backdrop-blur-md">
+        <div className="mb-5 flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300">
+          <SlidersHorizontal className="h-4 w-4 text-brand-500" />
+          Filters Configuration
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
           <Input
             label="Make"
             placeholder="e.g. Toyota"
@@ -165,22 +168,24 @@ export const SearchPage: React.FC = () => {
           />
         </div>
         {hasFilters && (
-          <button
-            onClick={handleClear}
-            className="mt-4 text-xs font-semibold text-brand-500 hover:text-brand-600 transition-colors"
-          >
-            Clear all filters
-          </button>
+          <div className="mt-4 flex justify-start">
+            <button
+              onClick={handleClear}
+              className="text-xs font-bold text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300 transition-colors focus:underline"
+            >
+              Clear all filters
+            </button>
+          </div>
         )}
       </Card>
 
       {/* No filters prompt */}
       {!hasFilters && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-16 text-center dark:border-gray-800 dark:bg-gray-900">
-          <Search className="mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200/80 bg-white/50 dark:bg-gray-900/30 p-16 text-center dark:border-gray-800/80 max-w-lg mx-auto">
+          <Search className="mb-4 h-14 w-14 text-gray-400" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">Start searching</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Enter at least one filter above to search the inventory
+          <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs">
+            Enter at least one search filter above to load matching vehicles
           </p>
         </div>
       )}
@@ -188,7 +193,7 @@ export const SearchPage: React.FC = () => {
       {/* Loading skeletons */}
       {hasFilters && isLoading && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <ResultSkeleton key={i} />
           ))}
         </div>
@@ -196,10 +201,10 @@ export const SearchPage: React.FC = () => {
 
       {/* Error state */}
       {hasFilters && isError && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 p-12 text-center dark:border-red-900/30 dark:bg-red-950/10">
-          <AlertTriangle className="mb-4 h-12 w-12 text-red-400" />
-          <h2 className="text-lg font-bold text-red-600 dark:text-red-400">Search failed</h2>
-          <p className="mt-1 text-sm text-red-500/80 dark:text-red-400/60">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-red-200/60 bg-red-50/50 p-12 text-center dark:border-red-900/30 dark:bg-red-950/10 max-w-lg mx-auto">
+          <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
+          <h2 className="text-lg font-bold text-red-700 dark:text-red-400">Search failed</h2>
+          <p className="mt-2 text-sm text-red-600/80 dark:text-red-400/60 leading-relaxed">
             {(error as Error)?.message || "An unexpected error occurred."}
           </p>
         </div>
@@ -207,28 +212,28 @@ export const SearchPage: React.FC = () => {
 
       {/* Empty results */}
       {hasFilters && !isLoading && !isError && data?.vehicles.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200 bg-white p-16 text-center dark:border-gray-800 dark:bg-gray-900">
-          <Package className="mb-4 h-16 w-16 text-gray-300 dark:text-gray-600" />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-gray-200/80 bg-white/50 dark:bg-gray-900/30 p-16 text-center dark:border-gray-800/80 max-w-lg mx-auto">
+          <Package className="mb-4 h-14 w-14 text-gray-400" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">No results found</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Try adjusting your filters for broader results
+          <p className="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs">
+            Try adjusting your pricing limits or query spellings for broader results
           </p>
         </div>
       )}
 
       {/* Results grid */}
       {hasFilters && !isLoading && !isError && data && data.vehicles.length > 0 && (
-        <>
-          <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-            Found <span className="font-bold text-gray-900 dark:text-white">{data.total}</span>{" "}
-            {data.total === 1 ? "vehicle" : "vehicles"}
+        <div className="space-y-4">
+          <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+            Found <span className="text-gray-900 dark:text-white font-bold">{data.total}</span>{" "}
+            {data.total === 1 ? "vehicle" : "vehicles"} matching your criteria
           </p>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {data.vehicles.map((vehicle) => (
               <VehicleResultCard key={vehicle.id} vehicle={vehicle} />
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
