@@ -5,6 +5,15 @@ import { isValidUuidOrTestId } from "../utils/uuid";
 import { AppError, NotFoundError } from "@domain/exceptions/AppError";
 
 export class PrismaVehicleRepository implements IVehicleRepository {
+  // Reusable transaction utility wrapping db calls in interactive transactions (or mock fallbacks)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async runTransaction<T>(work: (tx: any) => Promise<T>): Promise<T> {
+    if (prisma.$transaction) {
+      return prisma.$transaction(work);
+    }
+    return work(prisma);
+  }
+
   async create(data: {
     make: string;
     model: string;
@@ -26,9 +35,7 @@ export class PrismaVehicleRepository implements IVehicleRepository {
   async findById(id: string): Promise<PrismaVehicle | null> {
     // Enforce standard UUID format check to prevent database crash on bad query string lookups,
     // but allow simple mock test IDs (like uuid-v1) used in test suites
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    const isTestId = id.startsWith("uuid-");
-    if (!uuidRegex.test(id) && !isTestId) {
+    if (!isValidUuidOrTestId(id)) {
       return null;
     }
 
@@ -105,9 +112,8 @@ export class PrismaVehicleRepository implements IVehicleRepository {
       throw new NotFoundError("Vehicle not found.");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const executePurchase = async (client: any): Promise<PrismaVehicle> => {
-      const vehicle = await client.vehicle.findUnique({
+    return this.runTransaction(async (tx) => {
+      const vehicle = await tx.vehicle.findUnique({
         where: { id }
       });
 
@@ -119,17 +125,10 @@ export class PrismaVehicleRepository implements IVehicleRepository {
         throw new AppError("Vehicle is out of stock.", 400, "OUT_OF_STOCK");
       }
 
-      return client.vehicle.update({
+      return tx.vehicle.update({
         where: { id },
         data: { quantity: vehicle.quantity - 1 }
       });
-    };
-
-    // If transaction wrapper exists, execute within transaction, otherwise direct client execution (e.g. mock test)
-    if (prisma.$transaction) {
-      return prisma.$transaction((tx) => executePurchase(tx));
-    } else {
-      return executePurchase(prisma);
-    }
+    });
   }
 }
