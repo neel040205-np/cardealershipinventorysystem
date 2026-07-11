@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { vehicleService, SearchFilters } from "@infra/api/vehicle-service";
+import { useSearchVehiclesQuery } from "@adapters/hooks/useVehicles";
 import { useDebounce } from "@adapters/hooks/useDebounce";
 import { Vehicle } from "@core/entities/Vehicle";
 import { Card } from "@presentation/components/shared/Card";
 import { Input } from "@presentation/components/shared/Input";
 import { Car, Search, AlertTriangle, Package, SlidersHorizontal } from "lucide-react";
+import { SearchFilters } from "@infra/api/vehicle-service";
 
 // Result card (matching VehiclesPage styles for visual consistency)
 const VehicleResultCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
@@ -101,11 +101,7 @@ export const SearchPage: React.FC = () => {
   }, [debouncedMake, debouncedModel, debouncedCategory, debouncedMinPrice, debouncedMaxPrice, setSearchParams]);
 
   // Query — only fires when at least one filter is present
-  const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["vehicles-search", filters],
-    queryFn: () => vehicleService.search(filters),
-    enabled: hasFilters
-  });
+  const { data, isLoading, isError, error } = useSearchVehiclesQuery(filters, hasFilters);
 
   const handleClear = () => {
     setMake("");
@@ -205,7 +201,7 @@ export const SearchPage: React.FC = () => {
           <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
           <h2 className="text-lg font-bold text-red-700 dark:text-red-400">Search failed</h2>
           <p className="mt-2 text-sm text-red-600/80 dark:text-red-400/60 leading-relaxed">
-            {(error as Error)?.message || "An unexpected error occurred."}
+            {error?.message || "An unexpected error occurred."}
           </p>
         </div>
       )}

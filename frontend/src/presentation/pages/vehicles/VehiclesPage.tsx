@@ -1,10 +1,8 @@
 import React from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { vehicleService } from "@infra/api/vehicle-service";
+import { useVehiclesQuery, usePurchaseMutation } from "@adapters/hooks/useVehicles";
 import { Vehicle } from "@core/entities/Vehicle";
 import { Card } from "@presentation/components/shared/Card";
 import { Button } from "@presentation/components/shared/Button";
-import { useToast } from "@adapters/context/toast-context";
 import { Car, AlertTriangle, Package, ShoppingCart } from "lucide-react";
 
 // Skeleton card shown during loading with pulsing gradient effect
@@ -26,21 +24,7 @@ const VehicleCardSkeleton: React.FC = () => (
 // Individual vehicle card with purchase button
 const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const inStock = vehicle.quantity > 0;
-  const queryClient = useQueryClient();
-  const toast = useToast();
-
-  const purchaseMutation = useMutation({
-    mutationFn: () => vehicleService.purchase(vehicle.id),
-    onSuccess: () => {
-      toast.success(`Successfully purchased ${vehicle.make} ${vehicle.model}!`);
-      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
-    },
-    onError: (error: any) => {
-      const message =
-        error.response?.data?.error?.message || "Purchase failed. Please try again.";
-      toast.error(message);
-    }
-  });
+  const purchaseMutation = usePurchaseMutation();
 
   return (
     <Card hoverable className="flex flex-col h-full justify-between">
@@ -86,7 +70,7 @@ const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           size="sm"
           disabled={!inStock || purchaseMutation.isPending}
           isLoading={purchaseMutation.isPending}
-          onClick={() => purchaseMutation.mutate()}
+          onClick={() => purchaseMutation.mutate(vehicle.id)}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           {inStock ? "Purchase" : "Out of Stock"}
@@ -97,16 +81,7 @@ const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
 };
 
 export const VehiclesPage: React.FC = () => {
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch
-  } = useQuery({
-    queryKey: ["vehicles"],
-    queryFn: () => vehicleService.getAll()
-  });
+  const { data, isLoading, isError, error, refetch } = useVehiclesQuery();
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
@@ -137,7 +112,7 @@ export const VehiclesPage: React.FC = () => {
             Failed to load inventory
           </h2>
           <p className="mt-2 text-sm text-red-600/80 dark:text-red-400/60 leading-relaxed">
-            {(error as Error)?.message || "An unexpected network error occurred."}
+            {error?.message || "An unexpected network error occurred."}
           </p>
           <Button
             onClick={() => refetch()}

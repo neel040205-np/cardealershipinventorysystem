@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { vehicleService } from "@infra/api/vehicle-service";
 import { Vehicle } from "@core/entities/Vehicle";
-import { useToast } from "@adapters/context/toast-context";
 import { Modal } from "@presentation/components/shared/Modal";
 import { Input } from "@presentation/components/shared/Input";
 import { Button } from "@presentation/components/shared/Button";
 import { Spinner } from "@presentation/components/shared/Spinner";
+import { useVehicleAdminMutations } from "@adapters/hooks/useVehicles";
 import {
   Plus,
   Pencil,
@@ -39,33 +39,33 @@ type RestockFormValues = z.infer<typeof restockSchema>;
 
 // ─── Add Vehicle Modal ──────────────────────────────────────────────
 
-const AddVehicleModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
-  isOpen,
-  onClose
-}) => {
-  const queryClient = useQueryClient();
-  const toast = useToast();
+interface AddVehicleModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  createMutation: ReturnType<typeof useVehicleAdminMutations>["createMutation"];
+}
 
+const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
+  isOpen,
+  onClose,
+  createMutation
+}) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema)
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: VehicleFormValues) => vehicleService.create(data),
-    onSuccess: (vehicle) => {
-      toast.success(`${vehicle.make} ${vehicle.model} added to inventory.`);
-      queryClient.invalidateQueries({ queryKey: ["admin-vehicles"] });
-      reset();
-      onClose();
-    },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || "Failed to add vehicle.");
-    }
-  });
+  const onSubmit = (data: VehicleFormValues) => {
+    createMutation.mutate(data, {
+      onSuccess: () => {
+        reset();
+        onClose();
+      }
+    });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Add New Vehicle">
-      <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input label="Make" placeholder="e.g. Toyota" error={errors.make?.message} {...register("make")} />
         <Input label="Model" placeholder="e.g. Camry" error={errors.model?.message} {...register("model")} />
         <Input label="Category" placeholder="e.g. Sedan" error={errors.category?.message} {...register("category")} />
@@ -75,7 +75,7 @@ const AddVehicleModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="submit" isLoading={mutation.isPending}>Add Vehicle</Button>
+          <Button type="submit" isLoading={createMutation.isPending}>Add Vehicle</Button>
         </div>
       </form>
     </Modal>
@@ -84,14 +84,14 @@ const AddVehicleModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
 
 // ─── Edit Vehicle Modal ─────────────────────────────────────────────
 
-const EditVehicleModal: React.FC<{
+interface EditVehicleModalProps {
   isOpen: boolean;
   onClose: () => void;
   vehicle: Vehicle | null;
-}> = ({ isOpen, onClose, vehicle }) => {
-  const queryClient = useQueryClient();
-  const toast = useToast();
+  updateMutation: ReturnType<typeof useVehicleAdminMutations>["updateMutation"];
+}
 
+const EditVehicleModal: React.FC<EditVehicleModalProps> = ({ isOpen, onClose, vehicle, updateMutation }) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
     values: vehicle
@@ -99,22 +99,22 @@ const EditVehicleModal: React.FC<{
       : undefined
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: VehicleFormValues) => vehicleService.update(vehicle!.id, data),
-    onSuccess: (updated) => {
-      toast.success(`${updated.make} ${updated.model} updated.`);
-      queryClient.invalidateQueries({ queryKey: ["admin-vehicles"] });
-      reset();
-      onClose();
-    },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || "Failed to update vehicle.");
-    }
-  });
+  const onSubmit = (data: VehicleFormValues) => {
+    if (!vehicle) return;
+    updateMutation.mutate(
+      { id: vehicle.id, data },
+      {
+        onSuccess: () => {
+          reset();
+          onClose();
+        }
+      }
+    );
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Vehicle">
-      <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <Input label="Make" error={errors.make?.message} {...register("make")} />
         <Input label="Model" error={errors.model?.message} {...register("model")} />
         <Input label="Category" error={errors.category?.message} {...register("category")} />
@@ -124,7 +124,7 @@ const EditVehicleModal: React.FC<{
         </div>
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="submit" isLoading={mutation.isPending}>Save Changes</Button>
+          <Button type="submit" isLoading={updateMutation.isPending}>Save Changes</Button>
         </div>
       </form>
     </Modal>
@@ -133,25 +133,22 @@ const EditVehicleModal: React.FC<{
 
 // ─── Delete Vehicle Modal ───────────────────────────────────────────
 
-const DeleteVehicleModal: React.FC<{
+interface DeleteVehicleModalProps {
   isOpen: boolean;
   onClose: () => void;
   vehicle: Vehicle | null;
-}> = ({ isOpen, onClose, vehicle }) => {
-  const queryClient = useQueryClient();
-  const toast = useToast();
+  deleteMutation: ReturnType<typeof useVehicleAdminMutations>["deleteMutation"];
+}
 
-  const mutation = useMutation({
-    mutationFn: () => vehicleService.delete(vehicle!.id),
-    onSuccess: () => {
-      toast.success(`${vehicle!.make} ${vehicle!.model} removed from inventory.`);
-      queryClient.invalidateQueries({ queryKey: ["admin-vehicles"] });
-      onClose();
-    },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || "Failed to delete vehicle.");
-    }
-  });
+const DeleteVehicleModal: React.FC<DeleteVehicleModalProps> = ({ isOpen, onClose, vehicle, deleteMutation }) => {
+  const handleConfirm = () => {
+    if (!vehicle) return;
+    deleteMutation.mutate(vehicle.id, {
+      onSuccess: () => {
+        onClose();
+      }
+    });
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Delete Vehicle">
@@ -167,8 +164,8 @@ const DeleteVehicleModal: React.FC<{
           <Button
             type="button"
             variant="danger"
-            isLoading={mutation.isPending}
-            onClick={() => mutation.mutate()}
+            isLoading={deleteMutation.isPending}
+            onClick={handleConfirm}
           >
             Delete Vehicle
           </Button>
@@ -180,34 +177,34 @@ const DeleteVehicleModal: React.FC<{
 
 // ─── Restock Vehicle Modal ──────────────────────────────────────────
 
-const RestockVehicleModal: React.FC<{
+interface RestockVehicleModalProps {
   isOpen: boolean;
   onClose: () => void;
   vehicle: Vehicle | null;
-}> = ({ isOpen, onClose, vehicle }) => {
-  const queryClient = useQueryClient();
-  const toast = useToast();
+  restockMutation: ReturnType<typeof useVehicleAdminMutations>["restockMutation"];
+}
 
+const RestockVehicleModal: React.FC<RestockVehicleModalProps> = ({ isOpen, onClose, vehicle, restockMutation }) => {
   const { register, handleSubmit, formState: { errors }, reset } = useForm<RestockFormValues>({
     resolver: zodResolver(restockSchema)
   });
 
-  const mutation = useMutation({
-    mutationFn: (data: RestockFormValues) => vehicleService.restock(vehicle!.id, data.quantity),
-    onSuccess: (updated) => {
-      toast.success(`${updated.make} ${updated.model} restocked. New quantity: ${updated.quantity}`);
-      queryClient.invalidateQueries({ queryKey: ["admin-vehicles"] });
-      reset();
-      onClose();
-    },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.error?.message || "Failed to restock vehicle.");
-    }
-  });
+  const onSubmit = (data: RestockFormValues) => {
+    if (!vehicle) return;
+    restockMutation.mutate(
+      { id: vehicle.id, quantity: data.quantity },
+      {
+        onSuccess: () => {
+          reset();
+          onClose();
+        }
+      }
+    );
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={`Restock ${vehicle?.make ?? ""} ${vehicle?.model ?? ""}`}>
-      <form onSubmit={handleSubmit((d) => mutation.mutate(d))} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <p className="text-sm text-gray-500 dark:text-gray-400">
           Current stock: <span className="font-bold text-gray-900 dark:text-white">{vehicle?.quantity ?? 0}</span>
         </p>
@@ -220,7 +217,7 @@ const RestockVehicleModal: React.FC<{
         />
         <div className="flex justify-end gap-3 pt-2">
           <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-          <Button type="submit" isLoading={mutation.isPending}>Restock</Button>
+          <Button type="submit" isLoading={restockMutation.isPending}>Restock</Button>
         </div>
       </form>
     </Modal>
@@ -239,6 +236,8 @@ export const AdminPage: React.FC = () => {
     queryKey: ["admin-vehicles"],
     queryFn: () => vehicleService.getAll()
   });
+
+  const { createMutation, updateMutation, deleteMutation, restockMutation } = useVehicleAdminMutations();
 
   return (
     <div className="space-y-6">
@@ -362,10 +361,10 @@ export const AdminPage: React.FC = () => {
       )}
 
       {/* Modals */}
-      <AddVehicleModal isOpen={addOpen} onClose={() => setAddOpen(false)} />
-      <EditVehicleModal isOpen={!!editVehicle} onClose={() => setEditVehicle(null)} vehicle={editVehicle} />
-      <DeleteVehicleModal isOpen={!!deleteVehicle} onClose={() => setDeleteVehicle(null)} vehicle={deleteVehicle} />
-      <RestockVehicleModal isOpen={!!restockVehicle} onClose={() => setRestockVehicle(null)} vehicle={restockVehicle} />
+      <AddVehicleModal isOpen={addOpen} onClose={() => setAddOpen(false)} createMutation={createMutation} />
+      <EditVehicleModal isOpen={!!editVehicle} onClose={() => setEditVehicle(null)} vehicle={editVehicle} updateMutation={updateMutation} />
+      <DeleteVehicleModal isOpen={!!deleteVehicle} onClose={() => setDeleteVehicle(null)} vehicle={deleteVehicle} deleteMutation={deleteMutation} />
+      <RestockVehicleModal isOpen={!!restockVehicle} onClose={() => setRestockVehicle(null)} vehicle={restockVehicle} restockMutation={restockMutation} />
     </div>
   );
 };
