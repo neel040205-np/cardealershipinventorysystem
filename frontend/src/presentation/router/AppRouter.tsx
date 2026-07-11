@@ -4,9 +4,9 @@ import { MainLayout } from "@presentation/layouts/MainLayout";
 import { AuthLayout } from "@presentation/layouts/AuthLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { LoginPage } from "@presentation/pages/auth/LoginPage";
+import { RegisterPage } from "@presentation/pages/auth/RegisterPage";
 
 // Dummy Page Stubs to ensure successful compilation without concrete pages implementations
-const DummyRegister = () => <div className="p-4">Register Page (Not Implemented)</div>;
 const DummyVehicles = () => <div className="p-4">Vehicles Catalog (Not Implemented)</div>;
 const DummySearch = () => <div className="p-4">Search Catalog (Not Implemented)</div>;
 const DummyAdmin = () => <div className="p-4">Admin Inventory Operations (Not Implemented)</div>;
@@ -19,7 +19,7 @@ export const AppRouter: React.FC = () => {
         {/* Public Authentication routes */}
         <Route element={<AuthLayout />}>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<DummyRegister />} />
+          <Route path="/register" element={<RegisterPage />} />
         </Route>
 
         {/* Protected Dashboard/App routes */}
