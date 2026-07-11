@@ -27,6 +27,11 @@ export const vehicleService = {
 
     const response = await axiosClient.get("/vehicles/search", { params });
     return { vehicles: response.data.data.vehicles, total: response.data.data.vehicles.length };
+  },
+
+  async purchase(id: string): Promise<Vehicle> {
+    const response = await axiosClient.post(`/vehicles/${id}/purchase`);
+    return response.data.data.vehicle;
   }
 };
 

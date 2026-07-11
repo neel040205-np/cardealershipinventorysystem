@@ -1,9 +1,11 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { vehicleService } from "@infra/api/vehicle-service";
 import { Vehicle } from "@core/entities/Vehicle";
 import { Card } from "@presentation/components/shared/Card";
-import { Car, AlertTriangle, Package } from "lucide-react";
+import { Button } from "@presentation/components/shared/Button";
+import { useToast } from "@adapters/context/toast-context";
+import { Car, AlertTriangle, Package, ShoppingCart } from "lucide-react";
 
 // Skeleton card shown during loading
 const VehicleCardSkeleton: React.FC = () => (
@@ -16,13 +18,30 @@ const VehicleCardSkeleton: React.FC = () => (
         <div className="h-6 w-24 rounded bg-gray-200 dark:bg-gray-700" />
         <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-700" />
       </div>
+      <div className="h-9 w-full rounded-lg bg-gray-200 dark:bg-gray-700" />
     </div>
   </div>
 );
 
-// Individual vehicle card
+// Individual vehicle card with purchase button
 const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
   const inStock = vehicle.quantity > 0;
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  const purchaseMutation = useMutation({
+    mutationFn: () => vehicleService.purchase(vehicle.id),
+    onSuccess: () => {
+      toast.success(`Successfully purchased ${vehicle.make} ${vehicle.model}!`);
+      // Invalidate the vehicles query to refresh inventory counts
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+    },
+    onError: (error: any) => {
+      const message =
+        error.response?.data?.error?.message || "Purchase failed. Please try again.";
+      toast.error(message);
+    }
+  });
 
   return (
     <Card hoverable>
@@ -55,6 +74,19 @@ const VehicleCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
             {inStock ? `${vehicle.quantity} in stock` : "Out of stock"}
           </span>
         </div>
+
+        {/* Purchase button */}
+        <Button
+          className="w-full mt-2"
+          variant={inStock ? "primary" : "secondary"}
+          size="sm"
+          disabled={!inStock || purchaseMutation.isPending}
+          isLoading={purchaseMutation.isPending}
+          onClick={() => purchaseMutation.mutate()}
+        >
+          <ShoppingCart className="mr-1.5 h-4 w-4" />
+          {inStock ? "Purchase" : "Out of Stock"}
+        </Button>
       </div>
     </Card>
   );
