@@ -57,7 +57,6 @@ model User {
 
   // Relations
   refreshTokens       RefreshToken[]
-  createdVehicles     Vehicle[]
   managedReservations Reservation[]
   salesTransactions   SalesTransaction[]
 
@@ -80,27 +79,19 @@ model RefreshToken {
 }
 
 model Vehicle {
-  id              String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  make            String        @db.VarChar(100)
-  model           String        @db.VarChar(100)
-  year            Int
-  vin             String        @unique @db.VarChar(17)
-  price           Decimal       @db.Decimal(12, 2)
-  status          VehicleStatus @default(AVAILABLE)
-  mileage         Int
-  transmission    Transmission
-  fuelType        FuelType      @map("fuel_type")
-  color           String        @db.VarChar(50)
-  createdByUserId String        @map("created_by_id") @db.Uuid
-  createdAt       DateTime      @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt       DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  make      String   @db.VarChar(100)
+  model     String   @db.VarChar(100)
+  category  String   @db.VarChar(100)
+  price     Decimal  @db.Decimal(12, 2)
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
-  createdBy        User              @relation(fields: [createdByUserId], references: [id], onDelete: Restrict)
   reservations     Reservation[]
   salesTransaction SalesTransaction?
 
-  @@index([status, make, model], name: "idx_vehicle_status_make_model")
   @@index([price], name: "idx_vehicle_price")
   @@index([createdAt(sort: Desc)], name: "idx_vehicle_created_at")
   @@map("vehicles")

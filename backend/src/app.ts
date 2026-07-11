@@ -53,7 +53,9 @@ app.get("/health", (_req, res) => {
 
 // Mount root router under versioned path
 import { rootRouter } from "@infra/express/routes";
+import { vehicleRouter } from "@infra/express/routes/vehicle.routes";
 app.use("/api/v1", rootRouter);
+app.use("/api/vehicles", vehicleRouter);
 
 // Catch-all route handler returning 404 for unmapped endpoints
 app.use((_req, _res, next) => {

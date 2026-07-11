@@ -51,7 +51,9 @@ app.get("/health", (_req, res) => {
 });
 // Mount root router under versioned path
 const routes_1 = require("@infra/express/routes");
+const vehicle_routes_1 = require("@infra/express/routes/vehicle.routes");
 app.use("/api/v1", routes_1.rootRouter);
+app.use("/api/vehicles", vehicle_routes_1.vehicleRouter);
 // Catch-all route handler returning 404 for unmapped endpoints
 app.use((_req, _res, next) => {
     next(new AppError_1.NotFoundError("The requested API route does not exist."));
