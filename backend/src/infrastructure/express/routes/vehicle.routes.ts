@@ -35,4 +35,7 @@ router.put(
 // DELETE /api/vehicles/:id (Delete vehicle - Admin only)
 router.delete("/:id", authMiddleware, adminMiddleware, vehicleController.delete);
 
+// POST /api/vehicles/:id/purchase (Purchase vehicle - Authenticated users only)
+router.post("/:id/purchase", authMiddleware, vehicleController.purchase);
+
 export { router as vehicleRouter };

@@ -23,4 +23,5 @@ export interface IVehicleRepository {
     data: Partial<{ make: string; model: string; category: string; price: number; quantity: number }>
   ): Promise<PrismaVehicle>;
   delete(id: string): Promise<PrismaVehicle>;
+  purchase(id: string): Promise<PrismaVehicle>;
 }

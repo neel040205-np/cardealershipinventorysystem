@@ -4,6 +4,7 @@ import { ListVehicles } from "@usecases/vehicle/ListVehicles";
 import { SearchVehicles } from "@usecases/vehicle/SearchVehicles";
 import { UpdateVehicle } from "@usecases/vehicle/UpdateVehicle";
 import { DeleteVehicle } from "@usecases/vehicle/DeleteVehicle";
+import { PurchaseVehicle } from "@usecases/vehicle/PurchaseVehicle";
 import { sendSuccessResponse } from "@infra/express/utils/response";
 import { VehicleMapper } from "@adapters/mappers/VehicleMapper";
 
@@ -13,7 +14,8 @@ export class VehicleController {
     private listUseCase: ListVehicles,
     private searchUseCase: SearchVehicles,
     private updateUseCase: UpdateVehicle,
-    private deleteUseCase: DeleteVehicle
+    private deleteUseCase: DeleteVehicle,
+    private purchaseUseCase: PurchaseVehicle
   ) {}
 
   // POST /api/vehicles
@@ -80,6 +82,17 @@ export class VehicleController {
       const { id } = req.params;
       await this.deleteUseCase.execute(id);
       sendSuccessResponse(res, 200, null);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // POST /api/vehicles/:id/purchase
+  purchase = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const vehicle = await this.purchaseUseCase.execute(id);
+      sendSuccessResponse(res, 200, { vehicle: VehicleMapper.toResponseDTO(vehicle) });
     } catch (error) {
       next(error);
     }

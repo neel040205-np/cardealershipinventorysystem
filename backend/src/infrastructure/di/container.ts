@@ -7,6 +7,7 @@ import { ListVehicles } from "@usecases/vehicle/ListVehicles";
 import { SearchVehicles } from "@usecases/vehicle/SearchVehicles";
 import { UpdateVehicle } from "@usecases/vehicle/UpdateVehicle";
 import { DeleteVehicle } from "@usecases/vehicle/DeleteVehicle";
+import { PurchaseVehicle } from "@usecases/vehicle/PurchaseVehicle";
 import { PrismaUserRepository } from "@adapters/repositories/PrismaUserRepository";
 import { PrismaVehicleRepository } from "@adapters/repositories/PrismaVehicleRepository";
 import { BcryptHashService } from "@adapters/services/BcryptHashService";
@@ -30,6 +31,7 @@ const listVehiclesUseCase = new ListVehicles(vehicleRepository);
 const searchVehiclesUseCase = new SearchVehicles(vehicleRepository);
 const updateVehicleUseCase = new UpdateVehicle(vehicleRepository);
 const deleteVehicleUseCase = new DeleteVehicle(vehicleRepository);
+const purchaseVehicleUseCase = new PurchaseVehicle(vehicleRepository);
 
 // Controllers
 export const authController = new AuthController(registerUserUseCase, loginUserUseCase);
@@ -38,5 +40,6 @@ export const vehicleController = new VehicleController(
   listVehiclesUseCase,
   searchVehiclesUseCase,
   updateVehicleUseCase,
-  deleteVehicleUseCase
+  deleteVehicleUseCase,
+  purchaseVehicleUseCase
 );
