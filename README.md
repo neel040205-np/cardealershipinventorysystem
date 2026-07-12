@@ -433,7 +433,7 @@ However, critical software engineering still rested entirely on human judgment. 
 
 # License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is developed strictly for educational and academic review purposes.
 
 ---
 
