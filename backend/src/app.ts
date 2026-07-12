@@ -51,6 +51,19 @@ app.get("/health", (_req, res) => {
   });
 });
 
+// Root API welcome landing page
+app.get("/", (_req, res) => {
+  res.status(200).json({
+    success: true,
+    data: {
+      message: "Welcome to the WheelDeal API Server",
+      status: "UP",
+      docs: "https://github.com/neel040205-np/cardealershipinventorysystem",
+      healthCheck: "/health"
+    }
+  });
+});
+
 // Mount root router under versioned path
 import { rootRouter } from "@infra/express/routes";
 import { vehicleRouter } from "@infra/express/routes/vehicle.routes";
