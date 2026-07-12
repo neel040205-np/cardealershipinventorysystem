@@ -56,7 +56,7 @@ export const MainLayout: React.FC = () => {
         <div className="flex h-16 items-center justify-between px-6 border-b border-gray-200 dark:border-gray-800">
           <Link to="/" className="flex items-center gap-2 font-bold text-brand-500">
             <Car className="h-6 w-6 animate-pulse" />
-            <span>Motors CRM</span>
+            <span>WheelDeal</span>
           </Link>
           <button className="lg:hidden text-gray-500 hover:text-gray-700" onClick={() => setSidebarOpen(false)}>
             <X className="h-5 w-5" />

@@ -19,8 +19,8 @@ export const AuthLayout: React.FC = () => {
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500 text-white shadow-lg">
             <Car className="h-6 w-6" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight">Motors CRM</h2>
-          <p className="mt-2 text-center text-sm text-gray-500">Dealership Inventory Dashboard</p>
+          <h2 className="mt-6 text-center text-3xl font-extrabold tracking-tight">WheelDeal</h2>
+          <p className="mt-2 text-center text-sm text-gray-500">Built with TDD</p>
         </div>
         <Outlet />
       </div>
