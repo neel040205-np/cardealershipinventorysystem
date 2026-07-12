@@ -178,6 +178,12 @@ car-dealership-inventory-system/
 ### Add New Vehicle Modal
 ![Add New Vehicle](docs/screenshots/add_vehicle.png)
 
+### Restock Vehicle Modal
+![Restock Vehicle](docs/screenshots/restock.png)
+
+### Mobile Responsive View
+![Mobile Responsive View](docs/screenshots/mobile_view.png)
+
 ### Testing Suite
 ![Testing Suite](https://placehold.co/800x450/1e293b/ffffff?text=Vitest+Suite+Console+Execution+Mockup)
 
