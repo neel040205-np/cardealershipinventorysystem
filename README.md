@@ -163,29 +163,23 @@ car-dealership-inventory-system/
 
 # Screenshots
 
-### Home Page
-![Home Page Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Home+Page+Mockup)
+### Login Page
+![Login Page](docs/screenshots/login.png)
 
-### Login
-![Login Screen Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Login+Screen+Mockup)
+### Dashboard / Vehicle Catalog
+![Dashboard / Vehicle Catalog](docs/screenshots/dashboard.png)
 
-### Dashboard
-![Dashboard Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Dashboard+Overview+Mockup)
+### Search Catalog
+![Search Catalog](docs/screenshots/search.png)
 
-### Vehicle Management
-![Vehicle Management Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Vehicle+Management+Mockup)
+### Admin Panel
+![Admin Panel](docs/screenshots/admin_panel.png)
 
-### Purchase/Restock
-![Purchase/Restock Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Purchase+and+Restock+Flow+Mockup)
+### Add New Vehicle Modal
+![Add New Vehicle](docs/screenshots/add_vehicle.png)
 
-### Reports
-![Reports Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=WheelDeal+Inventory+Reports+Mockup)
-
-### Testing
-![Testing Placeholder](https://placehold.co/800x450/1e293b/ffffff?text=Vitest+Suite+Console+Execution+Mockup)
-
-### Mobile View
-![Mobile View Placeholder](https://placehold.co/360x640/1e293b/ffffff?text=WheelDeal+Mobile+Responsive+View+Mockup)
+### Testing Suite
+![Testing Suite](https://placehold.co/800x450/1e293b/ffffff?text=Vitest+Suite+Console+Execution+Mockup)
 
 ---
 
