@@ -27,13 +27,15 @@ const VehicleResultCard: React.FC<{ vehicle: Vehicle }> = ({ vehicle }) => {
           </span>
         </div>
       </div>
-      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-baseline justify-between">
-        <p className="text-2xl font-black text-gray-900 dark:text-white">
+      <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800/80 flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
           ₹{Number(vehicle.price).toLocaleString("en-IN")}
         </p>
         <span
-          className={`text-xs font-bold uppercase tracking-wider ${
-            inStock ? "text-green-600 dark:text-green-400" : "text-red-500 dark:text-red-400"
+          className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${
+            inStock
+              ? "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400"
+              : "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400"
           }`}
         >
           {inStock ? `${vehicle.quantity} in stock` : "Out of stock"}
