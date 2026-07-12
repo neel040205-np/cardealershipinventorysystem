@@ -185,7 +185,7 @@ car-dealership-inventory-system/
 ![Mobile Responsive View](docs/screenshots/mobile_view.png)
 
 ### Testing Suite
-![Testing Suite](https://placehold.co/800x450/1e293b/ffffff?text=Vitest+Suite+Console+Execution+Mockup)
+![Testing Suite](docs/screenshots/testing.png)
 
 ---
 
